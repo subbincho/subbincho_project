@@ -1,0 +1,219 @@
+Python 3.7.0 (v3.7.0:1bf9cc5093, Jun 27 2018, 04:59:51) [MSC v.1914 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> # USAGE
+... # python motion_detector.py
+... # python motion_detector.py --video videos/example_01.mp4
+...
+>>> # import the necessary packages
+... from imutils.video import VideoStream
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ModuleNotFoundError: No module named 'imutils'
+>>> import argparse
+>>> import datetime
+>>> import imutils
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ModuleNotFoundError: No module named 'imutils'
+>>> import time
+>>> import cv2
+>>>
+>>> # construct the argument parser and parse the arguments
+... ap = argparse.ArgumentParser()
+>>> ap.add_argument("-v", "--video", help="path to the video file")
+_StoreAction(option_strings=['-v', '--video'], dest='video', nargs=None, const=None, default=None, type=None, choices=None, help='path to the video file', metavar=None)
+>>> ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
+_StoreAction(option_strings=['-a', '--min-area'], dest='min_area', nargs=None, const=None, default=500, type=<class 'int'>, choices=None, help='minimum area size', metavar=None)
+>>> args = vars(ap.parse_args())
+>>>
+>>> # if the video argument is None, then we are reading from webcam
+... if args.get("video", None) is None:
+... vs = VideoStream(src=0).start()
+  File "<stdin>", line 3
+    vs = VideoStream(src=0).start()
+     ^
+IndentationError: expected an indented block
+>>> time.sleep(2.0)
+>>>
+>>> # otherwise, we are reading from a video file
+... else:
+  File "<stdin>", line 2
+    else:
+       ^
+SyntaxError: invalid syntax
+>>> vs = cv2.VideoCapture(args["video"])
+warning: Error opening file (/build/opencv/modules/videoio/src/cap_ffmpeg_impl.hpp:901)
+warning:  (/build/opencv/modules/videoio/src/cap_ffmpeg_impl.hpp:902)
+>>>
+>>> # initialize the first frame in the video stream
+... firstFrame = None
+>>>
+>>> # loop over the frames of the video
+... while True:
+... # grab the current frame and initialize the occupied/unoccupied
+... # text
+... frame = vs.read()
+  File "<stdin>", line 5
+    frame = vs.read()
+        ^
+IndentationError: expected an indented block
+>>> frame = frame if args.get("video", None) is None else frame[1]
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'frame' is not defined
+>>> text = "Unoccupied"
+>>>
+>>> # if the frame could not be grabbed, then we have reached the end
+... # of the video
+... if frame is None:
+... break
+  File "<stdin>", line 4
+    break
+        ^
+IndentationError: expected an indented block
+>>>
+>>> # resize the frame, convert it to grayscale, and blur it
+... frame = imutils.resize(frame, width=500)
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+NameError: name 'imutils' is not defined
+>>> gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'frame' is not defined
+>>> gray = cv2.GaussianBlur(gray, (21, 21), 0)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'gray' is not defined
+>>>
+>>> # if the first frame is None, initialize it
+... if firstFrame is None:
+... firstFrame = gray
+  File "<stdin>", line 3
+    firstFrame = gray
+             ^
+IndentationError: expected an indented block
+>>> continue
+  File "<stdin>", line 1
+SyntaxError: 'continue' not properly in loop
+>>>
+>>> # compute the absolute difference between the current frame and
+... # first frame
+... frameDelta = cv2.absdiff(firstFrame, gray)
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+NameError: name 'gray' is not defined
+>>> thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'frameDelta' is not defined
+>>>
+>>> # dilate the thresholded image to fill in holes, then find contours
+... # on thresholded image
+... thresh = cv2.dilate(thresh, None, iterations=2)
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+NameError: name 'thresh' is not defined
+>>> cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
+... cv2.CHAIN_APPROX_SIMPLE)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'thresh' is not defined
+>>> cnts = imutils.grab_contours(cnts)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'imutils' is not defined
+>>>
+>>> # loop over the contours
+... for c in cnts:
+... # if the contour is too small, ignore it
+... if cv2.contourArea(c) < args["min_area"]:
+  File "<stdin>", line 4
+    if cv2.contourArea(c) < args["min_area"]:
+     ^
+IndentationError: expected an indented block
+>>> continue
+  File "<stdin>", line 1
+SyntaxError: 'continue' not properly in loop
+>>>
+>>> # compute the bounding box for the contour, draw it on the frame,
+... # and update the text
+... (x, y, w, h) = cv2.boundingRect(c)
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+NameError: name 'c' is not defined
+>>> cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'frame' is not defined
+>>> text = "Occupied"
+>>>
+>>> # draw the text and timestamp on the frame
+... cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
+... cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+NameError: name 'frame' is not defined
+>>> cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+... (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'frame' is not defined
+>>>
+>>> # show the frame and record if the user presses a key
+... cv2.imshow("Security Feed", frame)
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+NameError: name 'frame' is not defined
+>>> cv2.imshow("Thresh", thresh)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'thresh' is not defined
+>>> cv2.imshow("Frame Delta", frameDelta)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'frameDelta' is not defined
+>>> key = cv2.waitKey(1) & 0xFF
+>>>
+>>> # if the `q` key is pressed, break from the lop
+... if key == ord("q"):
+... break
+  File "<stdin>", line 3
+    break
+        ^
+IndentationError: expected an indented block
+>>>
+>>> # cleanup the camera and close any open windows
+... vs.stop() if args.get("video", None) is None else vs.release()
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+AttributeError: 'cv2.VideoCapture' object has no attribute 'stop'
+>>> cv2.destroyAllWindows()
+>>>
+>>>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
